@@ -3,7 +3,7 @@
   "modid": "projectilebalancer",
   "name": "Projectile Balancer",
   "description": "Balacing Projectiles",
-  "version": "0.2",
+  "version": "0.3",
   "mcversion": "1.12.2",
   "url": "",
   "updateUrl": "",

@@ -1,27 +1,29 @@
-package com.sm9.projectilebalancer;
+package com.sm9.projectilebalancer.command;
 
+import com.sm9.projectilebalancer.common.Config.MainConfig;
 import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentString;
 
-import static com.sm9.projectilebalancer.ProjectileBalancer.loadConfig;
+import javax.annotation.Nonnull;
 
-public class CmdReload extends CommandBase {
+public class Reload extends CommandBase {
+    @Nonnull
     @Override
     public String getName() {
         return "pbreload";
     }
 
+    @Nonnull
     @Override
-    public String getUsage(ICommandSender commandSender) {
+    public String getUsage(@Nonnull ICommandSender commandSender) {
         return "pbreload";
     }
 
     @Override
-    public void execute(MinecraftServer localServer, ICommandSender commandSender, String[] sArgs) throws CommandException {
-        loadConfig();
+    public void execute(@Nonnull MinecraftServer localServer, ICommandSender commandSender, @Nonnull String[] sArgs) {
+        MainConfig.loadConfig();
         commandSender.sendMessage(new TextComponentString("Projectile balancer config reloaded successfully!"));
     }
 }
