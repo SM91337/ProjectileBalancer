@@ -2,6 +2,7 @@ package com.sm9.projectilebalancer.util;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
@@ -23,6 +24,8 @@ public class General {
         float minDistance;
         float scaleAmount;
 
+        Class<? extends Entity> cLazz;
+
         for (String scaledMob : scaleConfig) {
             if (scaledMob == null || scaledMob.length() < 1 || scaledMob.isEmpty()) {
                 continue;
@@ -32,6 +35,17 @@ public class General {
 
             if (sMobInfo.length != 3) {
                 debugToConsole(Level.ERROR, "Bad scale specifier: '%s' Use <mob>-<mindistance>-<scaleamount>", scaledMob);
+                continue;
+            }
+
+            cLazz = EntityList.getClass(new ResourceLocation(sMobInfo[0]));
+
+            if (cLazz == null) {
+                continue;
+            }
+
+            if (cLazz == null || !findEntityIdByClass(cLazz).equals(sMobInfo[0]) || !EntityLiving.class.isAssignableFrom(cLazz)) {
+                debugToConsole(Level.ERROR, "Invalid mob specified: %s", sMobInfo[0]);
                 continue;
             }
 

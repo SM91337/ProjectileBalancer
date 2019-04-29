@@ -2,6 +2,7 @@ package com.sm9.projectilebalancer;
 
 import com.sm9.projectilebalancer.handler.ForgeEvents;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import org.apache.logging.log4j.Logger;
@@ -22,6 +23,11 @@ class ProjectileBalancer {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent evEvent) {
         ForgeEvents.preInit(evEvent);
+    }
+
+    @Mod.EventHandler
+    public void postInit(FMLPostInitializationEvent evEvent) {
+        ForgeEvents.postInit(evEvent);
     }
 
     @Mod.EventHandler
