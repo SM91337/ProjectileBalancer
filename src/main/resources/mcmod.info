@@ -1,16 +1,18 @@
 [
-{
-  "modid": "projectilebalancer",
-  "name": "Projectile Balancer",
-  "description": "Balacing Projectiles",
-  "version": "0.3",
-  "mcversion": "1.12.2",
-  "url": "",
-  "updateUrl": "",
-  "authorList": ["SM9"],
-  "credits": "Wolv21 for help with math!",
-  "logoFile": "",
-  "screenshots": [],
-  "dependencies": []
-}
+  {
+    "modid": "projectilebalancer",
+    "name": "Projectile Balancer",
+    "description": "Balacing Projectiles",
+    "version": "0.3",
+    "mcversion": "1.12.2",
+    "url": "",
+    "updateUrl": "",
+    "authorList": [
+      "SM9"
+    ],
+    "credits": "Wolv21 for help with math!",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
 ]
