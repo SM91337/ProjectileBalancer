@@ -19,63 +19,56 @@ import static com.sm9.projectilebalancer.handler.ForgeEvents.scaledMobs;
 
 public class General {
     public static void loadScaledMobs() {
-        String[] sMobInfo;
-        HashMap<String, Float> scaleTemp;
+        String[] mobInfoSplit;
+        HashMap<String, Float> scaleInfo;
         float minDistance;
         float scaleAmount;
 
         Class<? extends Entity> cLazz;
 
         for (String scaledMob : scaleConfig) {
-            if (scaledMob == null || scaledMob.length() < 1 || scaledMob.isEmpty()) {
+            if (scaledMob == null || scaledMob.isEmpty()) {
                 continue;
             }
 
-            sMobInfo = scaledMob.split(" ");
+            mobInfoSplit = scaledMob.split(" ");
 
-            if (sMobInfo.length != 3) {
+            if (mobInfoSplit.length != 3) {
                 debugToConsole(Level.ERROR, "Bad scale specifier: '%s' Use <mob>-<mindistance>-<scaleamount>", scaledMob);
                 continue;
             }
 
-            cLazz = EntityList.getClass(new ResourceLocation(sMobInfo[0]));
+            cLazz = EntityList.getClass(new ResourceLocation(mobInfoSplit[0]));
 
-            if (cLazz == null) {
+            if (cLazz == null || !EntityLiving.class.isAssignableFrom(cLazz) || !findEntityIdByClass(cLazz).equals(mobInfoSplit[0])) {
+                debugToConsole(Level.ERROR, "Invalid mob specified: %s", mobInfoSplit[0]);
                 continue;
             }
 
-            if (cLazz == null || !findEntityIdByClass(cLazz).equals(sMobInfo[0]) || !EntityLiving.class.isAssignableFrom(cLazz)) {
-                debugToConsole(Level.ERROR, "Invalid mob specified: %s", sMobInfo[0]);
-                continue;
-            }
-
-            if (scaledMobs.get(sMobInfo[0]) != null) {
+            if (scaledMobs.get(mobInfoSplit[0]) != null) {
                 debugToConsole(Level.WARN, "Duplicate scale specifier: '%s'", scaledMob);
                 continue;
             }
 
-            scaleTemp = new HashMap<>();
+            scaleInfo = new HashMap<>();
 
             try {
-                minDistance = Float.parseFloat(sMobInfo[1]);
-                scaleAmount = Float.parseFloat(sMobInfo[2]);
+                minDistance = Float.parseFloat(mobInfoSplit[1]);
+                scaleAmount = Float.parseFloat(mobInfoSplit[2]);
 
-                scaleTemp.put("MinDistance", minDistance);
-                scaleTemp.put("ScaleAmount", scaleAmount);
-            } catch (ArrayIndexOutOfBoundsException ex) {
-                debugToConsole(Level.ERROR, "Failed to parse specifier %s (%s)", scaledMob, ex.toString());
-                continue;
-            } catch (NullPointerException ex) {
+                scaleInfo.put("MinDistance", minDistance);
+                scaleInfo.put("ScaleAmount", scaleAmount);
+            } catch (ArrayIndexOutOfBoundsException | NullPointerException ex) {
                 debugToConsole(Level.ERROR, "Failed to parse specifier %s (%s)", scaledMob, ex.toString());
                 continue;
             }
 
-            debugToConsole(Level.INFO, "Successfully added scaled mob %s with MinDistance: %.3f, ScaleAmount: %.3f", sMobInfo[0], minDistance, scaleAmount);
-            scaledMobs.put(sMobInfo[0], scaleTemp);
+            debugToConsole(Level.INFO, "Successfully added scaled mob %s with MinDistance: %.3f, ScaleAmount: %.3f", mobInfoSplit[0], minDistance, scaleAmount);
+            scaledMobs.put(mobInfoSplit[0], scaleInfo);
         }
     }
 
-    public static float getScaledDamage(EntityPlayer localPlayer, EntityLivingBase damageVictim, float fInitialDamage, int iEventId) {
+    public static float getScaledDamage(EntityPlayer localPlayer, EntityLivingBase damageVictim, float initialDamage, int eventId) {
         HashMap<String, Float> scaleInfo = scaledMobs.get(findEntityIdByClass(damageVictim.getClass()));
 
         if (scaleInfo == null) {
@@ -89,25 +82,25 @@ public class General {
             return -1.0f;
         }
 
-        float fDistance = localPlayer.getDistance(damageVictim);
-        float fScale = ((fDistance - minDistance) * scaleAmount) * 100.0f;
-        float fNewDamage = fInitialDamage - ((fInitialDamage * fScale) / 100.0f);
+        float distance = localPlayer.getDistance(damageVictim);
+        float scale = ((distance - minDistance) * scaleAmount) * 100.0f;
+        float newDamage = initialDamage - ((initialDamage * scale) / 100.0f);
 
-        if (fNewDamage <= 0.0f) {
-            fNewDamage = 0.0f;
+        if (newDamage <= 0.0f) {
+            newDamage = 0.0f;
         }
 
         if (debugMode) {
-            if (fDistance <= minDistance && iEventId == 1) {
+            if (distance <= minDistance && eventId == 1) {
                 printToPlayer(localPlayer, "Distance less than %.3f, damage unaffected.", minDistance);
-            } else if (fNewDamage == 0.0f && iEventId == 0) {
+            } else if (newDamage == 0.0f && eventId == 0) {
                 printToPlayer(localPlayer, "Damage range ineffective.");
-            } else if (iEventId == 1) {
-                printToPlayer(localPlayer, "Distance: %.3f, Old Damage: %.3f, New Damage: %.3f, Scale: %.3f", fDistance, fInitialDamage, fNewDamage, fScale);
+            } else if (eventId == 1) {
+                printToPlayer(localPlayer, "Distance: %.3f, Old Damage: %.3f, New Damage: %.3f, Scale: %.3f", distance, initialDamage, newDamage, scale);
             }
         }
 
-        return fNewDamage;
+        return newDamage;
     }
 
     private static String findEntityIdByClass(Class<? extends Entity> clazz) {
@@ -115,12 +108,12 @@ public class General {
         return key == null ? null : key.toString();
     }
 
-    public static void printToPlayer(EntityPlayer entityPlayer, String sFormat, Object... oArgs) {
-        String sMessage = new Formatter().format(sFormat, oArgs).toString();
-        entityPlayer.sendMessage(new TextComponentString("[PB] " + sMessage));
+    private static void printToPlayer(EntityPlayer entityPlayer, String format, Object... args) {
+        String message = new Formatter().format(format, args).toString();
+        entityPlayer.sendMessage(new TextComponentString("[PB] " + message));
     }
 
-    public static void debugToConsole(Level logLevel, String sFormat, Object... oArgs) {
-        pbLogger.log(logLevel, new Formatter().format(sFormat, oArgs).toString());
+    private static void debugToConsole(Level logLevel, String format, Object... args) {
+        pbLogger.log(logLevel, new Formatter().format(format, args).toString());
     }
 }

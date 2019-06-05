@@ -22,7 +22,7 @@ public class Reload extends CommandBase {
     }
 
     @Override
-    public void execute(@Nonnull MinecraftServer localServer, ICommandSender commandSender, @Nonnull String[] sArgs) {
+    public void execute(@Nonnull MinecraftServer localServer, ICommandSender commandSender, @Nonnull String[] args) {
         MainConfig.loadConfig();
         commandSender.sendMessage(new TextComponentString("Projectile balancer config reloaded successfully!"));
     }

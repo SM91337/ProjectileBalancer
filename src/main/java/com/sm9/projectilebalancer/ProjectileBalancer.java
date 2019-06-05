@@ -21,17 +21,17 @@ class ProjectileBalancer {
     public static Logger pbLogger;
 
     @Mod.EventHandler
-    public void preInit(FMLPreInitializationEvent evEvent) {
-        ForgeEvents.preInit(evEvent);
+    public void preInit(FMLPreInitializationEvent event) {
+        ForgeEvents.preInit(event);
     }
 
     @Mod.EventHandler
-    public void postInit(FMLPostInitializationEvent evEvent) {
-        ForgeEvents.postInit(evEvent);
+    public void postInit(FMLPostInitializationEvent event) {
+        ForgeEvents.postInit();
     }
 
     @Mod.EventHandler
-    public void onWorldLoad(FMLServerStartingEvent evEvent) {
-        ForgeEvents.onWorldLoad(evEvent);
+    public void onWorldLoad(FMLServerStartingEvent event) {
+        ForgeEvents.onWorldLoad(event);
     }
 }
